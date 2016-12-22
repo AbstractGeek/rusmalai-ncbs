@@ -2,18 +2,20 @@ import numpy as np
 
 class ANN:
     ''' This is an artificial neural network'''
-    def __init__(self, numLayers, Input, hiddenNeuronList=[], eta = 0.1):
+    def __init__(self, numLayers, Input, target, hiddenNeuronList=[], eta = 0.1):
         self.numLayers = numLayers
         self.numHiddenLayers = numLayers - 2
         self.eta = eta
         self.__Input__ = np.matrix(Input)
+        self.number_of_features = self.__Input__.shape[1]
+        self.set_target(target)
         
         if not len(hiddenNeuronList):
-            self.hiddenNeuronList = [len(Input)]*self.numHiddenLayers ## Should be changed later to something more general
+            self.hiddenNeuronList = [self.number_of_features]*self.numHiddenLayers ## Should be changed later to something more general
         else:
             self.hiddenNeuronList = hiddenNeuronList
             
-        self.construct_network(Input)
+        self.construct_network()
         self.connect_layers()
 
     def set_target(self, target):
@@ -24,9 +26,9 @@ class ANN:
         except:
             return "Lengths of input and target don't match"
 
-    def construct_network(self,Input):
+    def construct_network(self):
         # Input layer Stuff
-        self.input_layer = input_layer(Input)
+        self.input_layer = input_layer(self.__Input__)
         
         # Create Hidden Layers
         self.hidden_layers = [hidden_layer(self.hiddenNeuronList[i], self.eta) for i in range(self.numHiddenLayers)]
@@ -98,7 +100,7 @@ class input_layer(neuron_layer):
     ''' This is the input layer'''
 
     def __init__(self, Input):
-        self.N = len(Input)
+        self.N = Input.shape[1]
         self.output = self.compute_layer(Input)
     
     def compute_layer(self,x):
@@ -158,6 +160,7 @@ class neuron:
         return self.delta
 
     def change_weight(self, eta):
+        print np.shape(self.delta), np.shape(self.layer.prev_layer.output)
         self.w += eta * self.delta * np.array(self.layer.prev_layer.output)
     #def get_delta(target):
     #    delta = (self.output - target) * self.output * (1 - self.output)
