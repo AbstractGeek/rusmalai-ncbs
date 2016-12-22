@@ -6,8 +6,9 @@ class ANN:
         self.numLayers = numLayers
         self.numHiddenLayers = numLayers - 2
         self.eta = eta
-        self.__Input__ = np.matrix(Input)
-        self.number_of_features = self.__Input__.shape[1]
+        self.__Input__ = np.matrix(Input).T
+        self.number_of_features = self.__Input__.shape[0]
+        self.number_of_training_points = self.__Input__.shape[1]
         self.set_target(target)
         
         if not len(hiddenNeuronList):
@@ -21,14 +22,14 @@ class ANN:
     def set_target(self, target):
         ''' Setting target to the ANN'''
         try:
-            np.shape(self.__Input__)[1] == len(target)
+            np.shape(self.__Input__)[0] == len(target)
             self.target = np.array(target)
         except:
             return "Lengths of input and target don't match"
 
     def construct_network(self):
         # Input layer Stuff
-        self.input_layer = input_layer(self.__Input__)
+        self.input_layer = input_layer(self.number_of_features)
         
         # Create Hidden Layers
         self.hidden_layers = [hidden_layer(self.hiddenNeuronList[i], self.eta) for i in range(self.numHiddenLayers)]
@@ -84,6 +85,7 @@ class neuron_layer:
         self.N = N
         self.neurons = [neuron(self) for i in range(N)]
         self.eta = eta
+        self.output = np.matrix()
 
     def connect_layer(self, prev_layer):
         self.prev_layer = prev_layer
@@ -99,12 +101,12 @@ class neuron_layer:
 class input_layer(neuron_layer):
     ''' This is the input layer'''
 
-    def __init__(self, Input):
-        self.N = Input.shape[1]
-        self.output = self.compute_layer(Input)
+    def __init__(self, N):
+        self.N = N 
     
     def compute_layer(self,x):
-        return np.array(x)
+        self.output = x
+        return self.output 
     
     def set_next_layer(self, next_layer):
         self.next_layer = next_layer
@@ -152,7 +154,8 @@ class neuron:
         return 1/(1+np.exp(-x))
 
     def compute(self,x):
-        self.output=self.sigmoid(np.dot(self.w,x))  
+        print np.shape(np.transpose(self.w)), x, self.layer, self
+        self.output=self.sigmoid(np.dot( np.transpose(self.w),x))  
         return self.output
 
     def set_delta(self, delta):
