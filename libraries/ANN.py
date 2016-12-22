@@ -15,8 +15,7 @@ class ANN:
 
         if not len(hiddenNeuronList):
             # Should be changed later to something more general
-            self.hiddenNeuronList =
-            [self.number_of_features]*self.numHiddenLayers
+            self.hiddenNeuronList = [self.number_of_features]*self.numHiddenLayers
         else:
             self.hiddenNeuronList = hiddenNeuronList
 
@@ -42,8 +41,7 @@ class ANN:
         # Create output layer
         self.output_layer = output_layer(1, self.eta)
 
-        self.layers = [self.input_layer] +
-        self.hidden_layers + [self.output_layer]
+        self.layers = [self.input_layer] + self.hidden_layers + [self.output_layer]
 
     def connect_layers(self):
         '''Connect layers'''
@@ -93,7 +91,6 @@ class neuron_layer:
         self.N = N
         self.neurons = [neuron(self) for i in range(N)]
         self.eta = eta
-        self.output = np.matrix()
 
     def connect_layer(self, prev_layer):
         self.prev_layer = prev_layer
@@ -105,7 +102,6 @@ class neuron_layer:
     def compute_layer(self):
         self.output = [n.compute(self.prev_layer.output) for n in self.neurons]
         return self.output
-
 
 class input_layer(neuron_layer):
     ''' This is the input layer'''
