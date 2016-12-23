@@ -100,6 +100,7 @@ class neuron_layer:
 
     def connect_layer(self, prev_layer):
         self.prev_layer = prev_layer
+        self.index = self.prev_layer.index + 1
         prev_layer.set_next_layer(self)
         numEdges = prev_layer.N * self.N
         for n in self.neurons:
@@ -120,6 +121,7 @@ class input_layer(neuron_layer):
 
     def __init__(self, N):
         self.N = N + 1 
+        self.index = 0
     
     def compute_layer(self,x):
         self.output = x
@@ -167,9 +169,10 @@ class neuron:
         return 1/(1+np.exp(-x))
 
     def compute(self):
-        self.output = self.sigmoid(np.ravel(np.dot( np.transpose(self.w), self.layer.prev_layer.output)))
-        if isinstance(self.layer, hidden_layer):
-            self.output[-1] = 1
+        if not (isinstance(self.layer, hidden_layer) and self.index == 0):
+            self.output = self.sigmoid(np.ravel(np.dot( np.transpose(self.w), self.layer.prev_layer.output)))
+        else:
+            self.output = np.ones(self.layer.prev_layer.output.shape[1]) #Bias units outputing ones all the time.
         return self.output
 
     def set_delta(self, delta):
