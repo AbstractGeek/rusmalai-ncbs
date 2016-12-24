@@ -1,6 +1,5 @@
 import numpy as np
 
-
 class ANN:
     ''' This is an artificial neural network'''
 
@@ -75,15 +74,18 @@ class ANN:
             layer.compute_layer()
         self.output_layer.compute_layer()
 
-    def iterate(self, iterations):
+    def iterate(self, iterations=1):
         error = []
         for i in range(iterations):
             self.compute_forward()
             self.backpropagate(self.target)
             self.update_weights()
-            error.append(self.__error_function__( self.target, self.output_layer.output[0]))
-        return error
+            if iterations != 1:
+                error.append(self.__error_function__( self.target, self.output_layer.output[0]))
+            else:
+                error = self.__error_function__( self.target, self.output_layer.output[0])
 
+        return error
 
 class neuron_layer:
     ''' This is a neural network layer'''
@@ -96,7 +98,7 @@ class neuron_layer:
         self.neurons = [neuron(self, index) for index in range(self.N)]
         self.eta = eta
         self.output = np.zeros((self.N,numDataPoints))
-        self.delta = np.zeros(self.N)
+        self.delta = np.zeros((self.N,numDataPoints))
 
     def connect_layer(self, prev_layer):
         self.prev_layer = prev_layer
@@ -137,21 +139,23 @@ class hidden_layer(neuron_layer):
 
     def backpropagate(self):
         next_delta = self.next_layer.delta
+        # print neuron.w_out, next_delta
         for i, neuron in enumerate(self.neurons):
-            self.delta[i] = neuron.set_delta( np.sum (neuron.output * (1. - neuron.output) * np.dot(neuron.w_out, next_delta)))
+            self.delta[i] = neuron.set_delta( neuron.output * (1. - neuron.output) * np.dot(neuron.w_out, next_delta))
 
 class output_layer(neuron_layer):
 
     def backpropagate(self, target):
         for i, neuron in enumerate(self.neurons):
-            self.delta[i]  = neuron.set_delta( np.sum((target - neuron.output) * neuron.output * (1 - neuron.output)))
+            self.delta[i]  = neuron.set_delta( (target - neuron.output) * neuron.output * (1 - neuron.output))
 
 class neuron:
     '''Units inside a layer'''
 
-    def __init__(self, layer, index):
+    def __init__(self, layer, index, activation_method = 'sigmoid'):
         self.layer = layer
         self.index = index
+        self.activation_method = activation_method
 
     def set_w_out(self):
         if isinstance(self.layer, output_layer): 
@@ -164,15 +168,21 @@ class neuron:
         self.w = np.random.uniform(-1, 1, numInputs)
         # self.w = np.zeros(numInputs) # Just for kicks
 
+    def activation(self, input):
+        if self.activation_method == 'sigmoid':
+            return self.sigmoid(input)
+
     def sigmoid(self, x):
         ''' This is our activation function. '''
         return 1/(1+np.exp(-x))
 
     def compute(self):
         if not (isinstance(self.layer, hidden_layer) and self.index == 0):
-            self.output = self.sigmoid(np.ravel(np.dot( np.transpose(self.w), self.layer.prev_layer.output)))
+            input = np.ravel(np.dot( np.transpose(self.w), self.layer.prev_layer.output))
+            self.output = self.activation(input)
         else:
-            self.output = np.ones(self.layer.prev_layer.output.shape[1]) #Bias units outputing ones all the time.
+            factor = 0.99
+            self.output = np.ones(self.layer.prev_layer.output.shape[1])*factor #Bias units outputing ones all the time.
         return self.output
 
     def set_delta(self, delta):
@@ -180,4 +190,5 @@ class neuron:
         return self.delta
 
     def change_weight(self, eta):
-        self.w += eta * np.sum(self.delta * self.layer.prev_layer.output)
+        #print self.layer.index, self.index, self.delta , self.layer.prev_layer.output.T
+        self.w += eta * np.ravel(np.dot(self.delta , self.layer.prev_layer.output.T))
