@@ -1,4 +1,4 @@
-import ANN
+import NN
 import matplotlib.pyplot as plt
 from sklearn.datasets import load_iris
 
@@ -11,9 +11,9 @@ iterations = 200000
 
 input = [[0,0],[0,1],[1,0],[1,1]]
 target = [0,1,1,0]
-nn1 = ANN.ANN(numLayers, input, target, eta=0.05 )
+nn1 = NN.ANN(numLayers, input, target, eta=0.05 )
 
-e = nn1.iterate(iterations)
+e = nn1.train(iterations)
 achieved = nn1.output_layer.output
 print achieved
 #e = []
