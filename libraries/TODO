@@ -1,0 +1,5 @@
+Modify number of neurons methods in layer addNeuron(index), rmNeuron(index)
+Modify number of layers in NN addLayer(index), subtractLayer(index)
+
+Make a graph of the NN using GraphViz or networkx: Could this be made interactive? Say in some combination with js?
+Different modes in the NN: Batch, mini-batch, etc.

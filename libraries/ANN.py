@@ -1,6 +1,5 @@
 import numpy as np
 
-
 class ANN:
     ''' This is an artificial neural network'''
 
@@ -11,8 +10,9 @@ class ANN:
         self.__Input__ = np.matrix(Input).T
         self.number_of_features = self.__Input__.shape[0]
         self.number_of_training_points = self.__Input__.shape[1]
-        self.set_target(target)
 
+        self.__Input__ =  np.vstack([self.__Input__,[1]*self.number_of_training_points])
+        self.set_target(target)
         if not len(hiddenNeuronList):
             # Should be changed later to something more general
             self.hiddenNeuronList = [self.number_of_features]*self.numHiddenLayers
@@ -20,7 +20,9 @@ class ANN:
             self.hiddenNeuronList = hiddenNeuronList
 
         self.construct_network()
+        print "Network constructed with {} layers, learning rate is {}".format(self.numLayers, self.eta)
         self.connect_layers()
+        print "Layers connected"
 
     def set_target(self, target):
         ''' Setting target to the ANN'''
@@ -35,11 +37,10 @@ class ANN:
         self.input_layer = input_layer(self.number_of_features)
         
         # Create Hidden Layers
-        self.hidden_layers = [hidden_layer(self.hiddenNeuronList[i], self.eta)
-                              for i in range(self.numHiddenLayers)]
+        self.hidden_layers = [hidden_layer(self.hiddenNeuronList[i], self.number_of_training_points, self.eta ) for i in range(self.numHiddenLayers)]
 
         # Create output layer
-        self.output_layer = output_layer(1, self.eta)
+        self.output_layer = output_layer(1, self.number_of_training_points, self.eta )
 
         self.layers = [self.input_layer] + self.hidden_layers + [self.output_layer]
 
@@ -56,7 +57,7 @@ class ANN:
     def __error_function__(self, t, o):
         '''This is the error function'''
 
-        return 1/2*(np.sum(np.square(t-o)))
+        return (1./2)*(np.sum(np.square(t-o)))
 
     def backpropagate(self, target):
         self.output_layer.backpropagate(target)
@@ -73,41 +74,56 @@ class ANN:
             layer.compute_layer()
         self.output_layer.compute_layer()
 
-    def iterate(self, iterations):
+    def iterate(self, iterations=1):
         error = []
         for i in range(iterations):
             self.compute_forward()
             self.backpropagate(self.target)
             self.update_weights()
-            error.append(self.__error_function__(
-                self.target, np.array(self.output_layer.output)))
-        return error
+            if iterations != 1:
+                error.append(self.__error_function__( self.target, self.output_layer.output[0]))
+            else:
+                error = self.__error_function__( self.target, self.output_layer.output[0])
 
+        return error
 
 class neuron_layer:
     ''' This is a neural network layer'''
 
-    def __init__(self, N, eta):
-        self.N = N
-        self.neurons = [neuron(self) for i in range(N)]
+    def __init__(self, N, numDataPoints, eta):
+        if isinstance(self, hidden_layer):
+            self.N = N+1 # Adding bias neurons to the hidden layers
+        else:
+            self.N = N
+        self.neurons = [neuron(self, index) for index in range(self.N)]
         self.eta = eta
+        self.output = np.zeros((self.N,numDataPoints))
+        self.delta = np.zeros((self.N,numDataPoints))
 
     def connect_layer(self, prev_layer):
         self.prev_layer = prev_layer
+        self.index = self.prev_layer.index + 1
         prev_layer.set_next_layer(self)
         numEdges = prev_layer.N * self.N
         for n in self.neurons:
             n.initialize_weights(prev_layer.N)
 
     def compute_layer(self):
-        self.output = [n.compute(self.prev_layer.output) for n in self.neurons]
+        for i,n in enumerate(self.neurons):
+            self.output[i] = n.compute()
+            n.set_w_out()
         return self.output
+
+    def update(self):
+        for i, neuron in enumerate(self.neurons):
+            neuron.change_weight(self.eta)
 
 class input_layer(neuron_layer):
     ''' This is the input layer'''
 
     def __init__(self, N):
-        self.N = N 
+        self.N = N + 1 
+        self.index = 0
     
     def compute_layer(self,x):
         self.output = x
@@ -122,51 +138,51 @@ class hidden_layer(neuron_layer):
         self.next_layer = next_layer
 
     def backpropagate(self):
-        self.delta = []
         next_delta = self.next_layer.delta
+        # print neuron.w_out, next_delta
         for i, neuron in enumerate(self.neurons):
-            w_next = []
-            for n in self.next_layer.neurons:
-                w_next.append(n.w[i])
-            print np.shape(next_delta), np.shape(w_next)
-            self.delta.append(neuron.set_delta(
-                neuron.output * (1 - neuron.output) *
-                np.dot(np.array(w_next), next_delta)))
-
-    def update(self):
-        for i, neuron in enumerate(self.neurons):
-            neuron.change_weight(self.eta)
-
+            self.delta[i] = neuron.set_delta( neuron.output * (1. - neuron.output) * np.dot(neuron.w_out, next_delta))
 
 class output_layer(neuron_layer):
 
     def backpropagate(self, target):
-        self.delta = [neuron.set_delta(
-            (target[i] - neuron.output) * neuron.output * (1 - neuron.output))
-            for i, neuron in enumerate(self.neurons)]
-
-    def update(self):
         for i, neuron in enumerate(self.neurons):
-            neuron.change_weight(self.eta)
-
+            self.delta[i]  = neuron.set_delta( (target - neuron.output) * neuron.output * (1 - neuron.output))
 
 class neuron:
     '''Units inside a layer'''
 
-    def __init__(self, layer):
+    def __init__(self, layer, index, activation_method = 'sigmoid'):
         self.layer = layer
+        self.index = index
+        self.activation_method = activation_method
+
+    def set_w_out(self):
+        if isinstance(self.layer, output_layer): 
+            self.w_out = None
+        elif isinstance(self.layer, hidden_layer):
+            w_out = [n.w[self.index] for n in self.layer.next_layer.neurons]
+            self.w_out = np.array(w_out)         
 
     def initialize_weights(self, numInputs):
         self.w = np.random.uniform(-1, 1, numInputs)
         # self.w = np.zeros(numInputs) # Just for kicks
 
+    def activation(self, input):
+        if self.activation_method == 'sigmoid':
+            return self.sigmoid(input)
+
     def sigmoid(self, x):
         ''' This is our activation function. '''
         return 1/(1+np.exp(-x))
 
-    def compute(self,x):
-        print np.shape(np.transpose(self.w)), x, self.layer, self
-        self.output=self.sigmoid(np.dot( np.transpose(self.w),x))  
+    def compute(self):
+        if not (isinstance(self.layer, hidden_layer) and self.index == 0):
+            input = np.ravel(np.dot( np.transpose(self.w), self.layer.prev_layer.output))
+            self.output = self.activation(input)
+        else:
+            factor = 0.99
+            self.output = np.ones(self.layer.prev_layer.output.shape[1])*factor #Bias units outputing ones all the time.
         return self.output
 
     def set_delta(self, delta):
@@ -174,8 +190,5 @@ class neuron:
         return self.delta
 
     def change_weight(self, eta):
-        print np.shape(self.delta), np.shape(self.layer.prev_layer.output)
-        self.w += eta * self.delta * np.array(self.layer.prev_layer.output)
-
-    # def get_delta(target):
-    # delta = (self.output - target) * self.output * (1 - self.output)
+        #print self.layer.index, self.index, self.delta , self.layer.prev_layer.output.T
+        self.w += eta * np.ravel(np.dot(self.delta , self.layer.prev_layer.output.T))
