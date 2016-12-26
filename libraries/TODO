@@ -1,5 +1,6 @@
 In priority order:
 
+Unit test: By changing weights and monintoring the derivative of the cost function with respect to individual weights. 
 Save and load the NN from file.
 
 Modify number of neurons methods in layer addNeuron(index), rmNeuron(index)

@@ -7,7 +7,7 @@ data = load_iris()
 #input = data.data.T[:2].T
 #target = data.target
 numLayers = 3 
-iterations = 200000
+iterations = 10000
 
 input = [[0,0],[0,1],[1,0],[1,1]]
 target = [0,1,1,0]
