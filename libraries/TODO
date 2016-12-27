@@ -1,10 +1,10 @@
 In priority order:
 
-Unit test: By changing weights and monintoring the derivative of the cost function with respect to individual weights. 
+Write Unit test: By changing weights and monintoring the derivative of the cost function with respect to individual weights. 
 Save and load the NN from file.
 
 Modify number of neurons methods in layer addNeuron(index), rmNeuron(index)
-Modify number of layers in NN addLayer(index), subtractLayer(index)
+Modify number of layers in NN addLayer(index), rmayer(index)
 
 Different modes in the NN: Batch, mini-batch, etc.
 Different activation functions.
