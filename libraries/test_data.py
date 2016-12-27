@@ -1,4 +1,4 @@
-import NN
+import ANN
 import matplotlib.pyplot as plt
 from sklearn.datasets import load_digits 
 
@@ -12,7 +12,7 @@ iterations = 20000
 
 #input = [[0,0],[0,1],[1,0],[1,1]]
 #target = [0,1,1,0]
-nn1 = NN.ANN(numLayers, input, target, eta=0.05 )
+nn1 = ANN.FNN(numLayers, input, target, eta=0.05 )
 
 e = nn1.train(iterations)
 achieved = nn1.output_layer.output
