@@ -134,11 +134,11 @@ class FNN:
                                              self.__target__,
                                              self.output_layer.output))
             if i % (iterations/10.) == 0.:
-                print("{} iterations, loss = {}".format(i, error[-1]))
+                print("{} iterations, loss = {}".format(i+1, error[-1]))
         if iterations == 1:
-            return error[0]
+            return self.output_layer.output, error[0]
         else:
-            return error
+            return self.output_layer.output, error
 
     def test(self, test_data):
         ''' This is the main function which forward computes
