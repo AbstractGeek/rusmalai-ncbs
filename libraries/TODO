@@ -11,3 +11,9 @@ Different activation functions.
 Another learning algorithm?
 
 Make a graph of the NN using GraphViz or networkx: Could this be made interactive? Say in some combination with js?
+
+
+
+Extra stuff:
+
+1) log2(class_labels) 

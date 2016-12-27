@@ -4,18 +4,18 @@ from sklearn.datasets import load_iris
 
 data = load_iris()
 
-#input = data.data.T[:2].T
-#target = data.target
-numLayers = 3 
-iterations = 20000
+input = data.data.T[:2].T
+target = data.target
+numLayers = 3
+iterations = 500000
 
-input = [[0,0],[0,1],[1,0],[1,1]]
-target = [0,1,1,0]
-nn1 = ANN.FNN(numLayers, input, target, eta=0.05 )
+#input = [[0,0],[0,1],[1,0],[1,1]]
+#target = [0,1,1,0]
+nn1 = ANN.FNN(numLayers, input, target, eta=0.03)
 
 e = nn1.train(iterations)
 achieved = nn1.output_layer.output
-print achieved
+print(achieved)
 #e = []
 #for i in range(20000):
 #    e.append(nn1.iterate())
