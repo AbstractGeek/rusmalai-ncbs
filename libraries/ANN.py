@@ -24,8 +24,8 @@ class FNN:
             [self.__Input__, [1]*self.number_of_training_points])  # Add bias
         self.class_labels = set(target)
 
-        print(self.class_labels)
         self.number_of_classes = len(self.class_labels)
+        print("Class labels:{}".format(self.class_labels))
         self.set_target(target)
 
         if not len(hiddenNeuronList):
@@ -124,7 +124,6 @@ class FNN:
         ''' This is the main iteration function which forward computes,
             backpropagates, and updates weights for the NN '''
         error = []
-        print("Class labels:{}".format(self.class_labels))
         for i in range(iterations):
             self.compute_forward(self.__Input__)
             self.backpropagate(self.__target__)
@@ -133,8 +132,8 @@ class FNN:
                          self.calculateError(
                                              self.__target__,
                                              self.output_layer.output))
-            if i % (iterations/10.) == 0.:
-                print("{} iterations, loss = {}".format(i+1, error[-1]))
+            #if i % (iterations/10.) == 0.:
+            #    print("{} iterations, loss = {}".format(i+1, error[-1]))
         if iterations == 1:
             return self.output_layer.output, error[0]
         else:
