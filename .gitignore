@@ -7,6 +7,6 @@ Compiled python modules.
 *.pyc
 
 # Setuptools distribution folder.
-libraries/dist/
-libraries/build/
-libraries/*.egg-info
+packages/dist/
+packages/build/
+packages/*.egg-info
