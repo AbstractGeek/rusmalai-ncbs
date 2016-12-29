@@ -1,5 +1,12 @@
 /venv
 .ipynb_checkpoints
 .pyc
-libraries/ANN.egg-info
 __pycache__
+
+Compiled python modules.
+*.pyc
+
+# Setuptools distribution folder.
+libraries/dist/
+libraries/build/
+libraries/*.egg-info
