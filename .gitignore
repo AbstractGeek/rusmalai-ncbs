@@ -1,4 +1,5 @@
 /venv
 .ipynb_checkpoints
 .pyc
+libraries/ANN.egg-info
 __pycache__
