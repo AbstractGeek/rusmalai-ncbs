@@ -297,10 +297,10 @@ class neuron:
     def sigmoid_diff(self, output):
         ''' This is derivative of the sigmoid activation function. '''
         return output*(1-output)
-    
+
     def step(self, x, theta=0):
         ''' This is sigmoid activation function. '''
-        return 1 if x>theta else -1
+        return 1 if x >= theta else -1
 
     # Hyperbolic tan activation #
     def tanh(self, x):
