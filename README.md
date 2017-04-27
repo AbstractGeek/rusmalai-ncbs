@@ -5,6 +5,9 @@ RUSMALAI stands for Reinforcement Unsupervised MAchine Learning and Artificial I
 
 ## Topics covered (will be continuously updated as the journal club progresses)
 1. Perceptrons - a simple example of a perceptron based classification of two features on the iris dataset.
+2. Backpropagation learning - iris dataset
+3. XOR problem - Multi layer perceptrons - iris dataset
+4. Hopfield networks - Digit pattern completion
 
 ## Requirements (to get the ipython notebooks working)
 The scripts is written in python. It requires the following packages:
