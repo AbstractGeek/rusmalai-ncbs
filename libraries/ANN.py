@@ -1,22 +1,52 @@
 import numpy as np
 
 
+class neuron_layer:
+    ''' This is a neuron layer class '''
+
+    def __init__(self, input_size, neuron_number, eta):
+        ''' This initializes a neural network layer '''
+        self.weights = np.random.uniform(-1, 1, (input_size+1, neuron_number))
+        self.eta = eta
+
+    def compute(self, input_matrix):
+        return np.dot(input_matrix, self.weights)
+
+    def
+
+
+class neuron_layer:
+    ''' This is a neural network layer class'''
+
+    def __init__(self, input_size, neuron_number, eta):
+        ''' This initializes a neural network layer '''
+        self.neurons = [
+            neuron(np.random.uniform(-1, 1, input_size))
+            for index in range(neuron_number)]
+        self.eta = eta
+
+    def compute_layer(input_matrix):
+        return [neuron.compute(input_matrix) for neuron in neurons]
+
+
 class neuron:
     '''This is a neuron (Units inside a layer) class'''
 
-    def __init__(self, activation_method='sigmoid', bias_constant=0.99):
+    def __init__(self, weights,
+                 activation_method='sigmoid', bias_constant=0.99):
         ''' Initialize a neuron instance '''
         self.activation_method = activation_method
         self.bias_constant = bias_constant
+        self.initialize_weights(weights)
 
     def initialize_weights(self, weights):
         ''' Assign weights using this function
             (can reinitialize weights in between an iteration too) '''
         self.w = weights
 
-    def set_w_out(self, weights):
-        ''' Set output weights going out of the neuron '''
-        self.w_out = weights
+    # def set_w_out(self, weights):
+    #     ''' Set output weights going out of the neuron '''
+    #     self.w_out = weights
 
     def compute(self, x):
         ''' Compute the activation output for regular and bias neurons '''
