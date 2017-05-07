@@ -8,6 +8,8 @@ RUSMALAI stands for Reinforcement Unsupervised MAchine Learning and Artificial I
 2. Backpropagation learning - iris dataset
 3. XOR problem - Multi layer perceptrons - iris dataset
 4. Hopfield networks - Digit pattern completion
+5. Beginner's mnist - Using tensorflow
+6. Deep mnist - Using tensorflow
 
 ## Requirements (to get the ipython notebooks working)
 The scripts is written in python. It requires the following packages:
